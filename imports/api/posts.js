@@ -7,6 +7,7 @@ export class Post {
         this.url = "";
         this.text = "";
         this.created_at = new Date();
+        this.words = [];
     }
 
     get id() {

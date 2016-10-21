@@ -3,10 +3,11 @@ import Snoocore from 'snoocore';
 import moment from 'moment';
 import request from 'request';
 import htmlToText from 'html-to-text';
+import natural from 'natural';
 
 import {Post} from '../imports/api/posts';
 
-export function syncRedit() {
+export function syncRedit(start = moment().unix(), end = moment().subtract(6, 'months').unix()) {
     var reddit = new Snoocore({
         userAgent: '/u/psanabriaUC SmartBoardCronTask@1.0',
         throttle: 300,
@@ -19,19 +20,21 @@ export function syncRedit() {
         }
     });
 
-    var timestamp = "timestamp:" + moment().subtract(6, 'months').unix() + ".." + moment().unix();
+    var timestamp = "timestamp:" + end + ".." + start;
+    natural.LancasterStemmer.attach();
     readPages(reddit('/r/androiddev/search')
-        .listing({limit: 100, sort: 'new', q: timestamp, syntax:'cloudsearch',restrict_sr:'on'}), 10,
+            .listing({limit: 100, sort: 'new', q: timestamp, syntax: 'cloudsearch', restrict_sr: 'on'}), 10,
         Meteor.bindEnvironment((slice) => {
             slice.allChildren.forEach((child) => {
                 var post = new Post();
                 post.id = child.data.id;
                 post.title = child.data.title;
                 post.url = child.data.url;
-                post.created_at = new Date(child.data.created_utc);
+                post.created_at = new Date(child.data.created_utc * 1000);
 
                 if (child.data.is_self) {
                     post.text = child.data.selftext;
+                    post.words = post.text.tokenizeAndStem();
                     if (Post.collection.findOne({_id: post.id}) != null) {
                         Post.collection.update({_id: post.id}, post);
                     } else {
@@ -69,6 +72,7 @@ function retrieveTextFromPost(post) {
             post.text = htmlToText.fromString(body, {
                 wordwrap: 130
             });
+            post.words = post.text.tokenizeAndStem();
             if (Post.collection.findOne({_id: post.id}) != null) {
                 Post.collection.update({_id: post.id}, post);
             } else {
