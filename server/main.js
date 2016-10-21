@@ -1,5 +1,7 @@
 import { Meteor } from 'meteor/meteor';
+//import schedule from 'node-schedule';
+import {syncRedit} from './cron';
 
 Meteor.startup(() => {
-  // code to run on server at startup
+    syncRedit();
 });
