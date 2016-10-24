@@ -5,6 +5,6 @@ import './main.html';
 
 Template.body.helpers({
     posts() {
-        return Post.collection.find().count();
+        return Post.collection.count();
     }
 });

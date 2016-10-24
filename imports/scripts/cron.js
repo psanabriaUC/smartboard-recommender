@@ -3,9 +3,8 @@ import Snoocore from 'snoocore';
 import moment from 'moment';
 import request from 'request';
 import htmlToText from 'html-to-text';
-import natural from 'natural';
 
-import {Post} from '../imports/api/posts';
+import {Post} from '../api/posts';
 
 export function syncRedit(start = moment().unix(), end = moment().subtract(6, 'months').unix()) {
     var reddit = new Snoocore({
@@ -21,7 +20,6 @@ export function syncRedit(start = moment().unix(), end = moment().subtract(6, 'm
     });
 
     var timestamp = "timestamp:" + end + ".." + start;
-    natural.LancasterStemmer.attach();
     readPages(reddit('/r/androiddev/search')
             .listing({limit: 100, sort: 'new', q: timestamp, syntax: 'cloudsearch', restrict_sr: 'on'}), 10,
         Meteor.bindEnvironment((slice) => {
@@ -34,7 +32,6 @@ export function syncRedit(start = moment().unix(), end = moment().subtract(6, 'm
 
                 if (child.data.is_self) {
                     post.text = child.data.selftext;
-                    post.words = post.text.tokenizeAndStem();
                     if (Post.collection.findOne({_id: post.id}) != null) {
                         Post.collection.update({_id: post.id}, post);
                     } else {
@@ -72,7 +69,6 @@ function retrieveTextFromPost(post) {
             post.text = htmlToText.fromString(body, {
                 wordwrap: 130
             });
-            post.words = post.text.tokenizeAndStem();
             if (Post.collection.findOne({_id: post.id}) != null) {
                 Post.collection.update({_id: post.id}, post);
             } else {

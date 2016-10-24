@@ -1,0 +1,162 @@
+total StackExchange posts: 330135
+total Root posts: 41394
+Querys:
+----------------------------------------------------------------------
+db.posts.find().map(function(post) {
+    return {id: post._id, words: Object.keys(post.tfidfs).length};
+})
+----------------------------------------------------------------------
+db.posts.find().map(function(post) {
+    return Object.keys(post.tfidfs).length;
+}).reduce(function(result, value) {
+    if (value < 600) {
+        var index = Math.floor(value / 20);
+        result[index] += 1;
+    } else {
+        result[30] += 1;
+    }
+    return result;
+}, (new Array(31)).fill(0));
+----------------------------------------------------------------------
+function calc() {
+    var words = db.posts.find().map(function(post) {
+        return post.tfs;
+    }).reduce(function(words, tf) {
+        var keys = Object.keys(tf);
+        for(var i = 0; i < keys.length; i++) {
+            var word = keys[i];
+            words[word] = words[word] == undefined ? tf[word] : (words[word] + tf[word]);
+        }
+        return words;
+    },{});
+    result = [];
+    var keys = Object.keys(words);
+    for (var i = 0; i < keys.length; i++) {
+        result.push({word: keys[i], count: words[keys[i]]});
+    }
+    return result;
+}
+Array.sort(calc(), function(a, b) {
+    return b.count - a.count;
+}).slice(0, 20);
+----------------------------------------------------------------------
+Maximum Words: 1247
+Minimum Words: 3
+Average words: 68.74252307097647
+[
+    1900.0,
+    9040.0,
+    10188.0,
+    7590.0,
+    5128.0,
+    2903.0,
+    1830.0,
+    1115.0,
+    692.0,
+    382.0,
+    211.0,
+    158.0,
+    81.0,
+    42.0,
+    42.0,
+    23.0,
+    21.0,
+    11.0,
+    9.0,
+    7.0,
+    5.0,
+    2.0,
+    3.0,
+    2.0,
+    4.0,
+    0.0,
+    1.0,
+    1.0,
+    0.0,
+    2.0,
+    1.0
+]
+
+Words:
+[
+    {
+        "word" : "not",
+        "count" : 39938.0
+    },
+    {
+        "word" : "code",
+        "count" : 34471.0
+    },
+    {
+        "word" : "so",
+        "count" : 32444.0
+    },
+    {
+        "word" : "use",
+        "count" : 25512.0
+    },
+    {
+        "word" : "one",
+        "count" : 24229.0
+    },
+    {
+        "word" : "data",
+        "count" : 23152.0
+    },
+    {
+        "word" : "class",
+        "count" : 22959.0
+    },
+    {
+        "word" : "will",
+        "count" : 21806.0
+    },
+    {
+        "word" : "when",
+        "count" : 20549.0
+    },
+    {
+        "word" : "using",
+        "count" : 19018.0
+    },
+    {
+        "word" : "new",
+        "count" : 17535.0
+    },
+    {
+        "word" : "http",
+        "count" : 17381.0
+    },
+    {
+        "word" : "just",
+        "count" : 17173.0
+    },
+    {
+        "word" : "public",
+        "count" : 15802.0
+    },
+    {
+        "word" : "time",
+        "count" : 15228.0
+    },
+    {
+        "word" : "user",
+        "count" : 15044.0
+    },
+    {
+        "word" : "need",
+        "count" : 14721.0
+    },
+    {
+        "word" : "application",
+        "count" : 14521.0
+    },
+    {
+        "word" : "project",
+        "count" : 13688.0
+    },
+    {
+        "word" : "want",
+        "count" : 13610.0
+    }
+]

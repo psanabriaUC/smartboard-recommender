@@ -7,7 +7,10 @@ export class Post {
         this.url = "";
         this.text = "";
         this.created_at = new Date();
-        this.words = [];
+        this.tfs = {};
+        this.idfs = {};
+        this.tfidfs = {};
+        this.origin = Post.reddit;
     }
 
     get id() {
@@ -19,4 +22,6 @@ export class Post {
     }
 }
 
+Post.reddit = 'REDDIT';
+Post.stackExchange = 'STACK_EXCHANGE';
 Post.collection = new Mongo.Collection('posts');
